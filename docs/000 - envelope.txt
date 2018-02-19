@@ -1,0 +1,49 @@
+MessageId                   /// Header containing a stable message id for a message.
+CorrelationId               /// Header containing a correlation id for a message.
+MessageIntent               /// The intent of the current message.
+OriginatingEndpoint         /// Name of the endpoint where the given message originated.
+OriginatingAddress          /// The original reply to address for successfully processed messages.
+EnclosedMessageTypes        /// Header entry key indicating the types of messages contained.
+ContentType                 /// Header entry key indicating format of the payload.
+ReplyToAddress              /// Header containing the ReplyToAddress for a message.
+ConversationId              /// The id of the message conversation that this message is part of.
+TimeSent                    /// The time this message was sent from the client.
+Header                      /// Prefix included on the wire when sending applicative headers.
+        
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
