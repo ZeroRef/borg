@@ -1,8 +1,8 @@
 package org.zeroref.borg;
 
-import org.experimental.runtime.EndpointWire;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.zeroref.borg.runtime.EndpointWire;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,10 +1,10 @@
 package org.zeroref.borg;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.experimental.pipeline.DispatchMessagesToHandlers;
-import org.experimental.recoverability.ManagedEventLoop;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.zeroref.borg.pipeline.DispatchMessagesToHandlers;
+import org.zeroref.borg.recoverability.ManagedEventLoop;
 
 import java.util.Arrays;
 import java.util.List;

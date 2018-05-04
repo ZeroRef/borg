@@ -197,8 +197,8 @@ public class SampleApp  {
     @Test
     public void end2end() throws Exception {
 
-        String kfk = "";
-        String zk = "";
+        String kfk = "localhost:9092";
+        String zk = "localhost:2181";
         try(
                 EndpointWire cashier = new EndpointWire("cashier", kfk, zk);
                 EndpointWire barista = new EndpointWire("barista", kfk, zk);

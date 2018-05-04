@@ -1,8 +1,8 @@
 package org.zeroref.borg;
 
-import org.experimental.runtime.EndpointId;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.zeroref.borg.runtime.EndpointId;
 
 public class EndpointIdTest {
     EndpointId id = new EndpointId("component1");

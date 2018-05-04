@@ -1,10 +1,10 @@
 package org.zeroref.borg;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.experimental.pipeline.HandleMessages;
-import org.experimental.runtime.EndpointWire;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.zeroref.borg.pipeline.HandleMessages;
+import org.zeroref.borg.runtime.EndpointWire;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +24,7 @@ public class UowHandlerTest extends Env {
     public class Ping{}
     public class Pong{}
 
-    public class PingUowHandler implements HandleMessages<Ping>{
+    public class PingUowHandler implements HandleMessages<Ping> {
         private MessageBus bus;
 
         public PingUowHandler(MessageBus bus) {

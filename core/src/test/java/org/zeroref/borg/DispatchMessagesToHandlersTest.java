@@ -1,13 +1,13 @@
 package org.zeroref.borg;
 
-import org.experimental.directions.MessageDestinations;
-import org.experimental.pipeline.HandleMessages;
-import org.experimental.pipeline.MessageHandlerTable;
-import org.experimental.pipeline.MessagePipeline;
-import org.experimental.runtime.EndpointId;
-import org.experimental.transport.KafkaMessageSender;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.zeroref.borg.directions.MessageDestinations;
+import org.zeroref.borg.pipeline.HandleMessages;
+import org.zeroref.borg.pipeline.MessageHandlerTable;
+import org.zeroref.borg.pipeline.MessagePipeline;
+import org.zeroref.borg.runtime.EndpointId;
+import org.zeroref.borg.transport.KafkaMessageSender;
 
 import java.util.HashMap;
 import java.util.UUID;

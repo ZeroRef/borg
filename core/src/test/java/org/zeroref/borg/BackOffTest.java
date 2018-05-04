@@ -1,8 +1,8 @@
 package org.zeroref.borg;
 
-import org.experimental.recoverability.BackOff;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.zeroref.borg.recoverability.BackOff;
 
 public class BackOffTest {
     @Test
