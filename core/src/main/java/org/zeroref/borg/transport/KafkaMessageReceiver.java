@@ -34,7 +34,7 @@ public class KafkaMessageReceiver {
         props.put("auto.offset.reset", "earliest");
         props.put("max.poll.records", "1"); /* records to include in 1 poll */
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put("value.deserializer", "org.experimental.transport.TransportRecordByteSerializer");
+        props.put("value.deserializer", "org.zeroref.borg.transport.TransportRecordByteSerializer");
     }
 
     public void start() {
