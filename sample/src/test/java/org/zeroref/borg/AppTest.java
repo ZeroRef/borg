@@ -1,4 +1,4 @@
-package org.zeroref;
+package org.zeroref.borg;
 
 import static org.junit.Assert.assertTrue;
 
