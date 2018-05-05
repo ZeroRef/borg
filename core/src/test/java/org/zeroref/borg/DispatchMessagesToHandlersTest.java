@@ -81,17 +81,4 @@ public class DispatchMessagesToHandlersTest {
 
         }
     }
-
-    public class PingHandler2 implements HandleMessages<Ping>{
-        private MessageBus messageBus;
-
-        public PingHandler2(MessageBus messageBus) {
-            this.messageBus = messageBus;
-        }
-
-        @Override
-        public void handle(Ping message) {
-
-        }
-    }
 }

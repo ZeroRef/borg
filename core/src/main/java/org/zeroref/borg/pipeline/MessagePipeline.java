@@ -34,9 +34,9 @@ public class MessagePipeline implements DispatchMessagesToHandlers {
         if(handler == null){
             String simpleName = message.getLocalMessage().getClass().toString();
             LOGGER.warn("No handler registered for {}", simpleName);
-        }
+        }else
+            handler.handle(message.getLocalMessage());
 
-        handler.handle(message.getLocalMessage());
         unitOfWork.complete();
     }
 

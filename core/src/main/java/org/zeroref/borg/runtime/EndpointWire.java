@@ -141,7 +141,11 @@ public class EndpointWire implements Closeable{
                 ZKStringSerializer$.MODULE$);
         boolean isSecure = false;
         ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(zookeeper), isSecure);
-        AdminUtils.createTopic(zkUtils, topic, partitions, replication, topicConfig, RackAwareMode.Enforced$.MODULE$);
+
+        if(!AdminUtils.topicExists(zkUtils, topic)){
+            AdminUtils.createTopic(zkUtils, topic, partitions, replication, topicConfig, RackAwareMode.Enforced$.MODULE$);
+        }
+
         zkClient.close();
     }
 }

@@ -1,6 +1,6 @@
 package org.zeroref.borg.lab.pubsub;
 
-import org.zeroref.borg.Env;
+import org.zeroref.borg.lab.Env;
 import org.zeroref.borg.lab.SingleNodeKafkaCluster;
 
 public class PubSubTest

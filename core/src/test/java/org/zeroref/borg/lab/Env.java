@@ -1,9 +1,8 @@
-package org.zeroref.borg;
+package org.zeroref.borg.lab;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
-import org.zeroref.borg.lab.SingleNodeKafkaCluster;
 import org.zeroref.borg.runtime.EndpointWire;
 
 import java.io.IOException;

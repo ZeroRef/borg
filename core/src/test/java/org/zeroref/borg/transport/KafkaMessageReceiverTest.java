@@ -2,28 +2,19 @@ package org.zeroref.borg.transport;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.zeroref.borg.Env;
+import org.zeroref.borg.lab.Env;
 import org.zeroref.borg.MessageEnvelope;
+import org.zeroref.borg.lab.Msg;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class KafkaMessageReceiverTest extends Env {
 
-    private String env = "{" +
-            "\"uuid\":\"9fb046d0-4318-4f2e-8ec3-0152449ebe7d\"," +
-            "\"headers\":{}," +
-            "\"content\":{" +
-            "\"returnAddress\":\"c3\"," +
-            "\"type\":\"org.experimental.BusReplyTest$Ping\"," +
-            "\"payload\":\"{}\"" +
-            "}" +
-            "}\n";
-
     @Test
     public void receive_message_from_topic() throws Exception {
 
-        send("aaaaaaaa", env);
+        send("aaaaaaaa", Msg.from(Msg.Tick.class));
 
         List<String> subs = Arrays.asList("aaaaaaaa");
 
@@ -34,8 +25,6 @@ public class KafkaMessageReceiverTest extends Env {
             try{
                 MessageEnvelope messages = receiver.receive();
                 Assert.assertNotNull(messages);
-
-                System.out.println(messages + " " + i);
 
                 receiver.commit(messages);
 
