@@ -16,4 +16,26 @@ public class SagasTest {
 
         Assert.assertEquals(mapping.readKey(order), "22");
     }
+
+
+    /*
+    * how it works
+    *
+    *
+    * - wire persistence
+    * - read all saga definitions
+    *       + diagnose what starts a saga
+    *       + diagnose parity between mapping and handlers
+    *       + read all mappings
+    *
+    * - on message
+    *       is a saga subscription
+    *           saga = get saga by id ?? new saga for id
+    *
+    *           apply message
+    *
+    *           store saga
+    *
+    * 
+    * */
 }
