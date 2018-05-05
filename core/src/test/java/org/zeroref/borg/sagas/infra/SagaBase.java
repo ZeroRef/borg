@@ -1,8 +1,4 @@
-package org.zeroref.borg.sagas;
-
-import org.zeroref.borg.sagas.infra.KeyReader;
-
-import java.util.Collection;
+package org.zeroref.borg.sagas.infra;
 
 public abstract class SagaBase<STATE extends SagaState> {
     private boolean completed = false;
@@ -20,5 +16,5 @@ public abstract class SagaBase<STATE extends SagaState> {
         this.state = state;
     }
 
-    public abstract Collection<KeyReader> keyReaders();
+    public abstract void howToFindSaga(SagasMapping mapping);
 }

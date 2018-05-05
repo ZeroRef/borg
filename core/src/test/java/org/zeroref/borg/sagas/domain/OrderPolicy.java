@@ -1,13 +1,7 @@
 package org.zeroref.borg.sagas.domain;
 
-import org.zeroref.borg.sagas.SagaBase;
-import org.zeroref.borg.sagas.domain.OrderPlaced;
-import org.zeroref.borg.sagas.infra.FunctionKeyReader;
-import org.zeroref.borg.sagas.infra.KeyReader;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import org.zeroref.borg.sagas.infra.SagaBase;
+import org.zeroref.borg.sagas.infra.SagasMapping;
 
 public class OrderPolicy extends SagaBase<OrderPolicyState> {
 
@@ -16,14 +10,7 @@ public class OrderPolicy extends SagaBase<OrderPolicyState> {
     }
 
     @Override
-    public Collection<KeyReader> keyReaders() {
-        KeyReader reader = FunctionKeyReader.create(
-                OrderPlaced.class,
-                OrderPlaced::getOrderId
-        );
-
-        Set<KeyReader> readers = Collections.emptySet();
-        readers.add(reader);
-        return readers;
+    public void howToFindSaga(SagasMapping mapping) {
+        mapping.map(OrderPlaced.class, OrderPlaced::getOrderId);
     }
 }
