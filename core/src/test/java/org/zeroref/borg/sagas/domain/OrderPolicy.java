@@ -6,7 +6,10 @@ import org.zeroref.borg.sagas.infra.SagasMapping;
 public class OrderPolicy extends SagaBase<OrderPolicyState> {
 
     public void handle(OrderPlaced evt){
+        OrderPolicyState state = new OrderPolicyState();
+        state.setSagaId(evt.getOrderId());
 
+        setState(state);
     }
 
     @Override

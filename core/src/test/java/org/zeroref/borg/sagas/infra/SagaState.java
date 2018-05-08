@@ -1,6 +1,6 @@
 package org.zeroref.borg.sagas.infra;
 
-public class SagaState<KEY> {
+public class SagaState {
 
     private String sagaId;
     private String type;
