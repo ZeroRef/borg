@@ -2,10 +2,7 @@ package org.zeroref.borg.sagas;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.zeroref.borg.sagas.domain.OrderPlaced;
-import org.zeroref.borg.sagas.domain.OrderPolicy;
-import org.zeroref.borg.sagas.domain.OrderPolicyState;
-import org.zeroref.borg.sagas.domain.TrialPolicy;
+import org.zeroref.borg.sagas.domain.*;
 import org.zeroref.borg.sagas.infra.*;
 
 public class SagasTest {
@@ -59,6 +56,31 @@ public class SagasTest {
 
         OrderPolicyState state = orderPolicy.getState();
         Assert.assertEquals(state.getSagaId(), "ORD2014");
+    }
+
+    @Test
+    public void get_by_id_existing_mapping() {
+        SagaStorage storage = new SagaStorage();
+        TrialPolicyState policyState = new TrialPolicyState();
+        policyState.setSagaId("ORD2014");
+        policyState.setType(TrialPolicy.class.getTypeName());
+        storage.sagas.put("ORD2014", policyState);
+
+        SagaPersistence persistence = new SagaPersistence(storage);
+        persistence.register(TrialPolicy.class);
+
+        Assert.assertNotNull(persistence.getSagaById("ORD2014", new TrialExpired()));
+    }
+
+    @Test
+    public void get_by_id_new_mapping() {
+        SagaStorage storage = new SagaStorage();
+
+        SagaPersistence persistence = new SagaPersistence(storage);
+        persistence.register(OrderPolicy.class, TrialPolicy.class);
+
+
+        Assert.assertNotNull(persistence.getSagaById("ORD2014", new TrialExpired()));
     }
 
     @Test
