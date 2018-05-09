@@ -1,4 +1,4 @@
-package org.zeroref.borg.sagas.infra;
+package org.zeroref.borg.sagas;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

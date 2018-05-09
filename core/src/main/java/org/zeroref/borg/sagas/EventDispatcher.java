@@ -1,4 +1,4 @@
-package org.zeroref.borg.sagas.infra;
+package org.zeroref.borg.sagas;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -1,4 +1,4 @@
-package org.zeroref.borg.sagas.infra;
+package org.zeroref.borg.sagas;
 
 public abstract class SagaBase<STATE extends SagaState> {
     private boolean completed = false;

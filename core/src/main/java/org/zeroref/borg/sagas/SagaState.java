@@ -1,4 +1,4 @@
-package org.zeroref.borg.sagas.infra;
+package org.zeroref.borg.sagas;
 
 public class SagaState {
 

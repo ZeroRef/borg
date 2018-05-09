@@ -1,7 +1,7 @@
 package org.zeroref.borg.sagas.domain;
 
-import org.zeroref.borg.sagas.infra.SagaBase;
-import org.zeroref.borg.sagas.infra.SagasMapping;
+import org.zeroref.borg.sagas.SagaBase;
+import org.zeroref.borg.sagas.SagasMapping;
 
 public class TrialPolicy extends SagaBase<TrialPolicyState> {
 

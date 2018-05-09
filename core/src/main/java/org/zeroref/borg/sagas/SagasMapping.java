@@ -1,4 +1,4 @@
-package org.zeroref.borg.sagas.infra;
+package org.zeroref.borg.sagas;
 
 import java.util.HashMap;
 import java.util.Map;
