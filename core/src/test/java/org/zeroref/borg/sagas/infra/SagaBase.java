@@ -17,4 +17,8 @@ public abstract class SagaBase<STATE extends SagaState> {
     }
 
     public abstract void howToFindSaga(SagasMapping mapping);
+
+    public boolean isCompleted() {
+        return completed;
+    }
 }

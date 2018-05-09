@@ -8,43 +8,38 @@ import org.zeroref.borg.sagas.infra.*;
 public class SagasTest {
 
     @Test
-    public void mapping_def() {
+    public void mapping_red_key() {
         SagasMapping mapping = new SagasMapping();
         mapping.map(OrderPlaced.class, OrderPlaced::getOrderId);
 
-        OrderPlaced order = new OrderPlaced("22");
-
-        Assert.assertEquals(mapping.readKey(order), "22");
+        Assert.assertEquals(mapping.readKey(new OrderPlaced("22")), "22");
     }
 
     @Test
-    public void persistence_not_found_def() {
-        SagaStorage persistence = new SagaStorage();
-        SagaState saga = persistence.getById("22");
+    public void storage_state_not_found_null() {
+        SagaStorage storage = new SagaStorage();
 
-        Assert.assertNull(saga);
+        Assert.assertNull(storage.getById("22"));
     }
 
     @Test
-    public void persistence_get_by_id_def() {
-        SagaStorage persistence = new SagaStorage();
-        persistence.sagas.put("22", new OrderPolicyState());
+    public void storage_get_by_id() {
+        SagaStorage storage = new SagaStorage();
+        storage.sagas.put("22", new OrderPolicyState());
 
-        Object saga = persistence.getById("22");
-
-        Assert.assertNotNull(saga);
+        Assert.assertNotNull(storage.getById("22"));
     }
 
     @Test
-    public void persistence_save_def() {
-        SagaStorage persistence = new SagaStorage();
+    public void storage_save() {
+        SagaStorage storage = new SagaStorage();
 
         OrderPolicyState state = new OrderPolicyState();
         state.setSagaId("22");
 
-        persistence.store(state);
+        storage.store(state);
 
-        Assert.assertTrue(persistence.sagas.containsKey("22"));
+        Assert.assertTrue(storage.sagas.containsKey("22"));
     }
 
     @Test
@@ -54,55 +49,77 @@ public class SagasTest {
 
         dispatcher.applyHandle(new OrderPlaced("ORD2014"), orderPolicy);
 
-        OrderPolicyState state = orderPolicy.getState();
-        Assert.assertEquals(state.getSagaId(), "ORD2014");
+        Assert.assertEquals(orderPolicy.getState().getSagaId(), "ORD2014");
     }
 
     @Test
-    public void get_by_id_existing_mapping() {
+    public void dispatch_with_map_will_apply_to_existing() {
         SagaStorage storage = new SagaStorage();
         TrialPolicyState policyState = new TrialPolicyState();
-        policyState.setSagaId("ORD2014");
+        policyState.setSagaId("user@gmail.com");
         policyState.setType(TrialPolicy.class.getTypeName());
-        storage.sagas.put("ORD2014", policyState);
+        storage.sagas.put("user@gmail.com", policyState);
 
         SagaPersistence persistence = new SagaPersistence(storage);
         persistence.register(TrialPolicy.class);
 
-        Assert.assertNotNull(persistence.getSagaById("ORD2014", new TrialExpired()));
+        TrialCancelled o = new TrialCancelled();
+        o.setUserEmail("user@gmail.com");
+        persistence.dispatch(o);
+
+        Assert.assertTrue(policyState.isCancelled());
     }
 
     @Test
-    public void get_by_id_new_mapping() {
+    public void dispatch_with_map_will_no_op() {
         SagaStorage storage = new SagaStorage();
-
         SagaPersistence persistence = new SagaPersistence(storage);
-        persistence.register(OrderPolicy.class, TrialPolicy.class);
+        persistence.register(TrialPolicy.class);
 
-
-        Assert.assertNotNull(persistence.getSagaById("ORD2014", new TrialExpired()));
+        TrialCancelled o = new TrialCancelled();
+        o.setUserEmail("user@gmail.com");
+        persistence.dispatch(o);
     }
 
     @Test
-    public void register_mapping() {
+    public void dispatch_with_create_mapping_will_create_saga_if_missing() {
         SagaStorage storage = new SagaStorage();
+
         SagaPersistence persistence = new SagaPersistence(storage);
-        persistence.register(OrderPolicy.class, TrialPolicy.class);
+        persistence.register(TrialPolicy.class);
+
+        TrialActivated o = new TrialActivated();
+        o.setUserEmail("user@gmail.com");
+        persistence.dispatch(o);
 
 
-        //Assert.assertTrue(storage.sagas.containsKey("ORD2014"));
+        Assert.assertNotNull(storage.sagas.get("user@gmail.com"));
     }
 
     @Test
-    public void wip_def() {
+    public void dispatch_for_mark_completed_will_purge_storage() {
         SagaStorage storage = new SagaStorage();
+        TrialPolicyState policyState = new TrialPolicyState();
+        policyState.setSagaId("user@gmail.com");
+        policyState.setType(TrialPolicy.class.getTypeName());
+        storage.sagas.put("user@gmail.com", policyState);
+
         SagaPersistence persistence = new SagaPersistence(storage);
+        persistence.register(TrialPolicy.class);
+
+        TrialExpired o = new TrialExpired();
+        o.setUserEmail("user@gmail.com");
+        persistence.dispatch(o);
 
 
-        persistence.dispatch(new OrderPlaced("ORD2014"));
-
-        Assert.assertTrue(storage.sagas.containsKey("ORD2014"));
+        Assert.assertEquals(storage.sagas.size(), 0);
     }
+
+
+
+
+
+
 
 
     /*
@@ -112,7 +129,7 @@ public class SagasTest {
     * - wire persistence
     * - read all saga definitions
     *       + diagnose what starts a saga
-    *       + diagnose parity between mapping and handlers
+    *       + diagnose parity between mapping_red_key and handlers
     *       + read all mappings
     *
     * - on message

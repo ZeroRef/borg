@@ -14,4 +14,8 @@ public class SagaStorage {
     public void store(SagaState state) {
         sagas.put(state.getSagaId(), state);
     }
+
+    public void discontinue(String sagaId) {
+        sagas.remove(sagaId);
+    }
 }
