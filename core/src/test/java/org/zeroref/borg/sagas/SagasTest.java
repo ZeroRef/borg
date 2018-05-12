@@ -100,4 +100,13 @@ public class SagasTest {
 
         Assert.assertEquals(storage.sagas.size(), 0);
     }
+
+    @Test
+    public void lists_mapped_events_as_subscriptions() {
+        SagaPersistence persistence = new SagaPersistence(new SagaStorage());
+        persistence.register(TrialPolicy.class);
+
+        Assert.assertTrue(persistence.isSagaSubscription(new TrialExpired()));
+        Assert.assertFalse(persistence.isSagaSubscription(new Object()));
+    }
 }

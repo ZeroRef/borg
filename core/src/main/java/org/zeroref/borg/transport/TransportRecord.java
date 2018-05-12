@@ -6,16 +6,16 @@ import java.util.UUID;
 
 public class TransportRecord {
     private final UUID uuid;
-    private final Map<String, String> headers;
-    private final Map<String, String> content;
+    private final Map<String, Object> headers;
+    private final Map<String, Object> content;
 
-    public TransportRecord(UUID uuid, Map<String, String> content, Map<String, String> headers) {
+    public TransportRecord(UUID uuid, Map<String, Object> content, Map<String, Object> headers) {
         this.uuid = uuid;
         this.content = content;
         this.headers = headers;
     }
 
-    public TransportRecord(UUID uuid, Map<String, String> content) {
+    public TransportRecord(UUID uuid, Map<String, Object> content) {
         this(uuid, content, new HashMap<>());
     }
 
@@ -23,11 +23,11 @@ public class TransportRecord {
         return uuid;
     }
 
-    public Map<String, String> getContent() {
+    public Map<String, Object> getContent() {
         return content;
     }
 
-    public Map<String, String> getHeaders() {
+    public Map<String, Object> getHeaders() {
         return headers;
     }
 }

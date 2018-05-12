@@ -21,13 +21,13 @@ public class TransportRecordByteSerializerTest {
     @Test
     public void decode(){
         UUID uuid = UUID.randomUUID();
-        HashMap<String, String> c1 = new HashMap<>();
+        HashMap<String, Object> c1 = new HashMap<>();
         c1.put("a", "b");
         TransportRecord record = new TransportRecord(uuid, c1);
         byte[] recordBytes = recordGson.toJson(record).getBytes();
 
         TransportRecord record1 = serializer.deserialize("", recordBytes);
-        Map<String, String> c2 = record1.getContent();
+        Map<String, Object> c2 = record1.getContent();
 
         Assert.assertEquals(record1.getUuid(), record.getUuid());
         Assert.assertEquals(c2.get("a"), "b");

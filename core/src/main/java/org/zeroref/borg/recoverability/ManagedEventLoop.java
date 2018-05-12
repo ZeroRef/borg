@@ -32,7 +32,6 @@ public class ManagedEventLoop implements Closeable {
 
         this.worker = new Thread(this::StartReceiving,name);
         this.worker.start();
-
     }
 
     @Override

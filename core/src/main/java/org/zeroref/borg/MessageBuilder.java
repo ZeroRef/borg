@@ -11,7 +11,7 @@ public class MessageBuilder {
         this.localAddress = localAddress;
     }
 
-    public MessageEnvelope buildMessage(Map<String, String> headers, Object message) {
+    public MessageEnvelope buildMessage(Map<String, Object> headers, Object message) {
         return new MessageEnvelope(
                 UUID.randomUUID(),
                 localAddress,

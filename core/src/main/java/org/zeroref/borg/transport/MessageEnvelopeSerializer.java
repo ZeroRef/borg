@@ -1,6 +1,7 @@
 package org.zeroref.borg.transport;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.zeroref.borg.MessageEnvelope;
 
@@ -11,9 +12,9 @@ public class MessageEnvelopeSerializer {
     private Gson gson = new Gson();
 
     public ProducerRecord<String, TransportRecord> envelopeToRecord(MessageEnvelope envelope, String topic) {
-        HashMap<String, String> content = new HashMap<>();
+        HashMap<String, Object> content = new HashMap<>();
         content.put("type", envelope.getLocalMessage().getClass().getName());
-        content.put("payload", gson.toJson(envelope.getLocalMessage()));
+        content.put("payload",  gson.toJson(envelope.getLocalMessage()));
         content.put("returnAddress", envelope.getReturnAddress());
 
         TransportRecord transportRecord = new TransportRecord(
@@ -26,11 +27,14 @@ public class MessageEnvelopeSerializer {
     }
 
     public MessageEnvelope recordToEnvelope(TransportRecord record1) throws ClassNotFoundException {
-        Map<String, String> content = record1.getContent();
+        Map<String, Object> content = record1.getContent();
 
-        String returnAddress = content.get("returnAddress");
-        String payload = content.get("payload");
-        Class type = Class.forName(content.get("type"));
+        Object payloadObj = content.get("payload");
+        JsonObject jsonObject = gson.toJsonTree(payloadObj).getAsJsonObject();
+        String payload = jsonObject.toString();
+
+        String returnAddress = (String) content.get("returnAddress");
+        Class type = Class.forName((String)content.get("type"));
 
         Object localMessage = gson.fromJson(payload, type);
 

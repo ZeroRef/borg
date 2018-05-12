@@ -18,6 +18,9 @@ import org.zeroref.borg.pipeline.MessagePipeline;
 import org.zeroref.borg.recoverability.BackOff;
 import org.zeroref.borg.recoverability.Dispatcher;
 import org.zeroref.borg.recoverability.ManagedEventLoop;
+import org.zeroref.borg.sagas.SagaBase;
+import org.zeroref.borg.sagas.SagaPersistence;
+import org.zeroref.borg.sagas.SagaStorage;
 import org.zeroref.borg.transport.KafkaMessageSender;
 
 import java.io.Closeable;
@@ -40,6 +43,7 @@ public class EndpointWire implements Closeable{
     private ManagedEventLoop slrEventLoop;
     private ManagedEventLoop subscriptionsEventLoop;
     private final List<String> inputTopics;
+    private final SagaPersistence sagaPersistence = new SagaPersistence(new SagaStorage());
 
     private final BackOff flrBackoff = new BackOff(100L);
     private final BackOff slrBackoff = new BackOff(1500L);
@@ -53,13 +57,14 @@ public class EndpointWire implements Closeable{
         this.kafkaConnection = kafkaConnection;
         this.sender = new KafkaMessageSender(kafkaConnection);
         this.zookeeper = zookeeper;
-        this.pipeline = new MessagePipeline(table, sender, endpointId, router);
+        this.pipeline = new MessagePipeline(table, sender, endpointId, router, sagaPersistence);
         this.inputTopics = Arrays.asList(endpointId.getInputTopicName());
         this.inspector = new ConfigurationInspector(endpointId);
     }
 
     public void configure(){
 
+        inspector.inspectSagas(sagaPersistence);
         inspector.inspectHandlers(table);
         inspector.inspectSubscriptions(subscriptions);
         inspector.inspectRouting(router);
@@ -67,7 +72,6 @@ public class EndpointWire implements Closeable{
         inspector.inspectSlr(slrBackoff);
 
         inspector.present();
-
 
         createTopic(endpointId.getInputTopicName(), 1, 1, new Properties());
         createTopic(endpointId.getEventsTopicName(), 1, 1, new Properties());
@@ -78,7 +82,6 @@ public class EndpointWire implements Closeable{
         inputEventLoop = newLoopWithSlr(endpointId.getInputTopicName()+ "-in", inputTopics);
 
         slrEventLoop = newLoopWithError(endpointId.getInputTopicName()+ "-slr", Arrays.asList(endpointId.getSlrTopicName()));
-
 
 
         if(!subscriptions.sources().isEmpty())
@@ -119,6 +122,10 @@ public class EndpointWire implements Closeable{
 
     public <T> void registerHandler(Class<T> c, Function<MessageBus, HandleMessages<T>> handler) {
         table.registerHandler(c, handler);
+    }
+
+    public void registerSagas(Class<? extends SagaBase> ... sagaTypes){
+        sagaPersistence.register(sagaTypes);
     }
 
     public MessageBus getMessageBus() {

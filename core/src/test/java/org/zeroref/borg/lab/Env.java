@@ -1,7 +1,9 @@
 package org.zeroref.borg.lab;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 import org.zeroref.borg.runtime.EndpointWire;
 
@@ -12,7 +14,7 @@ public class Env {
 
     public static SingleNodeKafkaCluster CLUSTER;
 
-    @BeforeSuite
+    @BeforeClass
     public void boot() throws IOException {
         CLUSTER = new SingleNodeKafkaCluster();
         CLUSTER.startup();
@@ -27,7 +29,7 @@ public class Env {
         }
     }
 
-    @AfterSuite
+    @AfterClass
     public void release(){
         CLUSTER.shutdown();
     }

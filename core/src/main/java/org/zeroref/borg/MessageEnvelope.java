@@ -6,11 +6,11 @@ import java.util.UUID;
 public class MessageEnvelope {
     private final UUID uuid;
     private final String returnAddress;
-    private final Map<String, String> headers;
+    private final Map<String, Object> headers;
     private final Object localMessage;
     private Object offset;
 
-    public MessageEnvelope(UUID uuid, String returnAddress, Map<String, String> headers, Object localMessage) {
+    public MessageEnvelope(UUID uuid, String returnAddress, Map<String, Object> headers, Object localMessage) {
 
         this.uuid = uuid;
         this.returnAddress = returnAddress;
@@ -26,7 +26,7 @@ public class MessageEnvelope {
         return returnAddress;
     }
 
-    public Map<String, String> getHeaders() {
+    public Map<String, Object> getHeaders() {
         return headers;
     }
 

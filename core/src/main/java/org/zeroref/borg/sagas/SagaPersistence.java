@@ -4,13 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SagaPersistence {
     private final SagaStorage storage;
     private final EventDispatcher dispatcher = new EventDispatcher();
     private final Map<Class, Class> evtToSagaType = new HashMap<>();
+    private final Map<Class, List<Class>> confSagas = new HashMap<>();
     private final SagasMapping mapping = new SagasMapping();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SagaPersistence.class);
@@ -60,6 +63,11 @@ public class SagaPersistence {
     public void register(Class<? extends SagaBase> ... sagaTypes) {
         for(Class<?> sagaType : sagaTypes){
             try {
+
+                if(!confSagas.containsKey(sagaType)){
+                    confSagas.put(sagaType, new ArrayList<>());
+                }
+
                 Constructor<?> ctor = sagaType.getConstructor();
                 SagaBase sagaInfo = (SagaBase)ctor.newInstance();
                 sagaInfo.howToFindSaga(mapping);
@@ -69,15 +77,25 @@ public class SagaPersistence {
 
                 for(Class<?> evType : discoverMapping.mapExisting.keySet()){
                     evtToSagaType.put(evType, sagaType);
+                    confSagas.get(sagaType).add(evType);
                 }
 
                 for(Class<?> evType : discoverMapping.mapCreate.keySet()){
                     evtToSagaType.put(evType, sagaType);
+                    confSagas.get(sagaType).add(evType);
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public boolean isSagaSubscription(Object evt) {
+        return evtToSagaType.containsKey(evt.getClass());
+    }
+
+    public Map<Class, List<Class>> getConfSagas() {
+        return confSagas;
     }
 }
