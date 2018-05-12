@@ -23,11 +23,11 @@ public class KafkaMessageReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaMessageReceiver.class);
 
-    public KafkaMessageReceiver(String broker, List<String> topics) {
+    public KafkaMessageReceiver(String broker, String name, List<String> topics) {
         this.topics = topics;
         props = new Properties();
         props.put("bootstrap.servers", broker);
-        props.put("group.id", "test");
+        props.put("group.id", "gr-"+name);
         props.put("enable.auto.commit", "false");
         props.put("auto.commit.interval.ms", "1000");
         props.put("session.timeout.ms", "30000");
@@ -45,6 +45,7 @@ public class KafkaMessageReceiver {
     }
 
     public void stop() {
+        consumer.wakeup();
         consumer.close();
     }
 

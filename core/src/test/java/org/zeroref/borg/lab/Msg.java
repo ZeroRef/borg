@@ -11,37 +11,22 @@ public class Msg {
     public static class Ping{}
     public static class Pong{}
 
-    public static String from(Class cl){
-        return from(cl, "");
+    public static String fromInstance(Object cl){
+        return fromInstance(cl, "");
     }
 
-    public static String fromInstance(Object cl){
+    public static String fromInstance(Object cl, String originator){
         return "{" +
                 "\"uuid\":\"9fb046d0-4318-4f2e-8ec3-0152449ebe7d\"," +
                 "\"headers\":{}," +
                 "\"content\":{" +
                 "\"returnAddress\":\"" +
+                originator +
                 "\"," +
                 "\"type\":\"" +
                 cl.getClass().getName() +
                 "\"," +
-                "\"payload\":" + recordGson.toJson(cl) + 
-                "}" +
-                "}\n";
-    }
-
-    public static String from(Class cl, String origin){
-        return "{" +
-                "\"uuid\":\"9fb046d0-4318-4f2e-8ec3-0152449ebe7d\"," +
-                "\"headers\":{}," +
-                "\"content\":{" +
-                "\"returnAddress\":\"" +
-                origin +
-                "\"," +
-                "\"type\":\"" +
-                cl.getTypeName() +
-                "\"," +
-                "\"payload\":\"{}\"" +
+                "\"payload\":" + recordGson.toJson(cl) +
                 "}" +
                 "}\n";
     }

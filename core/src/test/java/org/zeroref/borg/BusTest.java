@@ -19,8 +19,6 @@ public class BusTest extends Env {
             MessageBus bus = wire.getMessageBus();
             bus.publish(new Msg.Ping());
 
-            Thread.sleep(4000);
-
             Assert.assertEquals(countMessages("new-york-times.events"), 1);
         }
     }
@@ -35,7 +33,7 @@ public class BusTest extends Env {
             wire.registerHandler(Msg.Tick.class, bus -> message -> cnt.incrementAndGet());
             wire.configure();
 
-            send("a-publisher.events", Msg.from(Msg.Tick.class));
+            send("a-publisher.events", Msg.fromInstance(new Msg.Tick()));
 
             Thread.sleep(4000);
 
@@ -52,8 +50,6 @@ public class BusTest extends Env {
             MessageBus bus = wire.getMessageBus();
             bus.send(new Msg.TurnOff());
 
-            Thread.sleep(4000);
-
             Assert.assertEquals(countMessages("vehicle-b"), 1);
         }
     }
@@ -65,9 +61,7 @@ public class BusTest extends Env {
             wire.registerHandler(Msg.Ping.class, bus -> message -> bus.reply(new Msg.Pong()));
             wire.configure();
 
-            send("auto-raply", Msg.from(Msg.Ping.class, "originaltor-ctrl"));
-
-            Thread.sleep(4000);
+            send("auto-raply", Msg.fromInstance(new Msg.Ping(), "originaltor-ctrl"));
 
             Assert.assertEquals(countMessages("originaltor-ctrl"), 1);
         }

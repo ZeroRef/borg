@@ -35,7 +35,26 @@ public class Env {
     }
 
     protected int countMessages(String topicName){
-        return CLUSTER.readAllMessages(topicName).size();
+
+        int budget = 10 * 1000;
+        int used = 0;
+
+        while (budget > used){
+            List<String> strings = CLUSTER.readAllMessages(topicName);
+            used +=100;
+
+            if(strings.size() == 0){
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                continue;
+            }
+            return strings.size();
+        }
+
+        return 0;
     }
 
     protected void send(String topic, String message){

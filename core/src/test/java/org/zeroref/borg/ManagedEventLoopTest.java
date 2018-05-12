@@ -26,7 +26,7 @@ public class ManagedEventLoopTest extends Env {
         try(ManagedEventLoop loop = new ManagedEventLoop("dispatch-loop", kfk, inputTopics, handlers)){
             loop.start();
 
-            send("dispatch-loop", Msg.from(Msg.Tick.class));
+            send("dispatch-loop", Msg.fromInstance(new Msg.Tick()));
 
             Thread.sleep(3000);
 

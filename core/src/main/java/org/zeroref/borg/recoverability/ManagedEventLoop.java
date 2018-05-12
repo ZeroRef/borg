@@ -17,6 +17,8 @@ public class ManagedEventLoop implements Closeable {
     private DispatchMessagesToHandlers router;
     private Thread worker;
 
+    private Object syncObject = new Object();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ManagedEventLoop.class);
 
     public ManagedEventLoop(String name, String kafka, List<String> inputTopics, DispatchMessagesToHandlers router) {
@@ -31,7 +33,15 @@ public class ManagedEventLoop implements Closeable {
             throw new RuntimeException("Subscription with 0 topics is not allowed for " + name);
 
         this.worker = new Thread(this::StartReceiving,name);
+        this.worker.setPriority(Thread.MAX_PRIORITY);
         this.worker.start();
+
+        synchronized(syncObject) {
+            try {
+                syncObject.wait();
+            } catch (InterruptedException e) {
+            }
+        }
     }
 
     @Override
@@ -40,14 +50,19 @@ public class ManagedEventLoop implements Closeable {
     }
 
     public void StartReceiving() {
-        LOGGER.info("started loop");
-
-        KafkaMessageReceiver receiver = new KafkaMessageReceiver(kafka, inputTopics);
+        KafkaMessageReceiver receiver = new KafkaMessageReceiver(kafka, name, inputTopics);
         receiver.start();
+
+        synchronized(syncObject) {
+            syncObject.notify();
+            LOGGER.info("started loop");
+        }
 
         while (true){
             try {
                 MessageEnvelope env = receiver.receive();
+
+                LOGGER.debug("Poll");
 
                 if(env == null)
                     continue;
@@ -58,11 +73,20 @@ public class ManagedEventLoop implements Closeable {
                 LOGGER.debug("Dispatch completed");
 
             } catch (InterruptException e) {
+                safeStop(receiver);
                 LOGGER.info("stopped loop");
                 break;
             } catch (Exception e) {
                 LOGGER.error("Message processing failed", e);
             }
+        }
+    }
+
+    private void safeStop(KafkaMessageReceiver receiver) {
+        try{
+            receiver.stop();
+        }catch (Exception ex){
+
         }
     }
 }
