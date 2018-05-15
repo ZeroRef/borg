@@ -25,7 +25,7 @@ public class RecoveryTest extends Env {
 
 
             Assert.assertEquals(countMessages("manual-review.errors"), 1);
-            Assert.assertEquals(cnt.get(), 5);
+            Assert.assertEquals(cnt.get(), 6);
         }
     }
 
@@ -43,7 +43,7 @@ public class RecoveryTest extends Env {
             send("recover-in-slr", Msg.fromInstance(new Msg.Ping()));
 
 
-            Assert.assertEquals(countMessages("recover-in-slr.errors"), 0);
+            Assert.assertEquals(expect0Messages("recover-in-slr.errors", 2000), 0);
             Assert.assertEquals(cnt.get(), 5);
         }
     }
@@ -62,7 +62,7 @@ public class RecoveryTest extends Env {
             send("recover-in-flr", Msg.fromInstance(new Msg.Ping()));
 
 
-            Assert.assertEquals(countMessages("recover-in-flr.errors"), 0);
+            Assert.assertEquals(expect0Messages("recover-in-flr.errors", 500), 0);
             Assert.assertEquals(cnt.get(), 2);
         }
     }

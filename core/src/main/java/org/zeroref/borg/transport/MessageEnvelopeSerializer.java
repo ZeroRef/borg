@@ -1,6 +1,7 @@
 package org.zeroref.borg.transport;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.zeroref.borg.MessageEnvelope;
@@ -30,8 +31,14 @@ public class MessageEnvelopeSerializer {
         Map<String, Object> content = record1.getContent();
 
         Object payloadObj = content.get("payload");
-        JsonObject jsonObject = gson.toJsonTree(payloadObj).getAsJsonObject();
-        String payload = jsonObject.toString();
+
+        String payload = "{}";
+
+        if(!payload.equals(payloadObj)){
+            JsonElement jsonElement = gson.toJsonTree(payloadObj);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            payload = jsonObject.toString();
+        }
 
         String returnAddress = (String) content.get("returnAddress");
         Class type = Class.forName((String)content.get("type"));

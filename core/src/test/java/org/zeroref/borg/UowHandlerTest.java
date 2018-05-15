@@ -33,8 +33,6 @@ public class UowHandlerTest extends Env {
 
             send("uow", Msg.fromInstance(new Msg.Ping()));
 
-            Thread.sleep(4000);
-
             Assert.assertEquals(countMessages("uow.events"), 0);
             Assert.assertEquals(countMessages("uow.errors"), 1);
         }

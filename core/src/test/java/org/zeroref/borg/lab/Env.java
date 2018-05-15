@@ -36,12 +36,12 @@ public class Env {
 
     protected int countMessages(String topicName){
 
-        int budget = 10 * 1000;
+        int budget = 5 * 1000;
         int used = 0;
 
         while (budget > used){
             List<String> strings = CLUSTER.readAllMessages(topicName);
-            used +=100;
+            used +=400;
 
             if(strings.size() == 0){
                 try {
@@ -52,6 +52,33 @@ public class Env {
                 continue;
             }
             return strings.size();
+        }
+
+        return 0;
+    }
+
+    protected int expect0Messages(String topicName, int deadline){
+
+        int used = 0;
+
+        while (deadline > used){
+            List<String> strings = CLUSTER.readAllMessages(topicName);
+            used +=400;
+
+            boolean holds = strings.size() == 0;
+
+            System.out.println(used);
+
+            if(holds){
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                continue;
+            }else{
+                return strings.size();
+            }
         }
 
         return 0;

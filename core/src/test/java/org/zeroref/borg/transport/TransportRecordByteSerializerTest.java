@@ -1,6 +1,8 @@
 package org.zeroref.borg.transport;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -31,11 +33,5 @@ public class TransportRecordByteSerializerTest {
 
         Assert.assertEquals(record1.getUuid(), record.getUuid());
         Assert.assertEquals(c2.get("a"), "b");
-    }
-
-    @Test
-    public void pack(){
-        TransportRecord record = new TransportRecord(UUID.randomUUID(), new HashMap<>());
-        System.out.println(recordGson.toJson(record));
     }
 }
