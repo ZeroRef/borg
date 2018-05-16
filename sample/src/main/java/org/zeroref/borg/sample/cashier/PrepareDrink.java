@@ -7,9 +7,9 @@ public class PrepareDrink
     public String drinkName;
     public int size;
     public String customerName;
-    public UUID correlationId;
+    public String correlationId;
 
-    public PrepareDrink(String drinkName, int size, String customerName, UUID correlationId) {
+    public PrepareDrink(String drinkName, int size, String customerName, String correlationId) {
         this.drinkName = drinkName;
         this.size = size;
         this.customerName = customerName;

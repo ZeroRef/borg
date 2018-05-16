@@ -5,7 +5,7 @@ import org.zeroref.borg.MessageBus;
 public abstract class SagaBase<STATE extends SagaState> {
     private boolean completed = false;
     private STATE state;
-    private MessageBus bus;
+    protected MessageBus bus;
 
     protected void markCompleted(){
         completed = true;

@@ -4,9 +4,9 @@ import java.util.UUID;
 
 public class PaymentComplete
 {
-    public PaymentComplete(UUID correlationId) {
+    public PaymentComplete(String correlationId) {
         this.correlationId = correlationId;
     }
 
-    public UUID correlationId;
+    public String correlationId;
 }

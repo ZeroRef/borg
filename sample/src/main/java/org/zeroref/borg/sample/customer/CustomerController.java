@@ -6,6 +6,8 @@ import org.zeroref.borg.sample.cashier.NewOrder;
 import org.zeroref.borg.sample.cashier.PaymentDue;
 import org.zeroref.borg.sample.cashier.SubmitPayment;
 
+import java.util.UUID;
+
 ////////// customer
 public class CustomerController {
 
@@ -21,6 +23,7 @@ public class CustomerController {
     }
 
     public void buyMeADrink(MessageBus bus) {
-        bus.send(new NewOrder("latte", 3, "ruslan"));
+        NewOrder message = new NewOrder("latte", 3, "ruslan", UUID.randomUUID().toString());
+        bus.send(message);
     }
 }

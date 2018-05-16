@@ -4,13 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeroref.borg.MessageEnvelope;
+import org.zeroref.borg.sagas.SagaPersistence;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MessageEnvelopeSerializer {
     private Gson gson = new Gson();
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageEnvelopeSerializer.class);
 
     public ProducerRecord<String, TransportRecord> envelopeToRecord(MessageEnvelope envelope, String topic) {
         HashMap<String, Object> content = new HashMap<>();
@@ -28,16 +32,23 @@ public class MessageEnvelopeSerializer {
     }
 
     public MessageEnvelope recordToEnvelope(TransportRecord record1) throws ClassNotFoundException {
+
+
+
         Map<String, Object> content = record1.getContent();
 
         Object payloadObj = content.get("payload");
 
         String payload = "{}";
 
-        if(!payload.equals(payloadObj)){
-            JsonElement jsonElement = gson.toJsonTree(payloadObj);
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-            payload = jsonObject.toString();
+        try{
+            if(!payload.equals(payloadObj)){
+                JsonElement jsonElement = gson.toJsonTree(payloadObj);
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                payload = jsonObject.toString();
+            }
+        }catch (Exception ex){
+            LOGGER.debug("Failed to parse " + payloadObj);
         }
 
         String returnAddress = (String) content.get("returnAddress");

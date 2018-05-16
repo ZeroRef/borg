@@ -4,11 +4,11 @@ import java.util.UUID;
 
 public class SubmitPayment
 {
-    public SubmitPayment(UUID correlationId, double amount) {
+    public SubmitPayment(String correlationId, double amount) {
         this.correlationId = correlationId;
         this.amount = amount;
     }
 
-    public UUID correlationId;
+    public String correlationId;
     public double amount;
 }
