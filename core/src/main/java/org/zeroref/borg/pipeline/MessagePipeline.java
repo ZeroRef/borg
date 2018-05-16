@@ -38,7 +38,7 @@ public class MessagePipeline implements DispatchMessagesToHandlers {
             HandleMessages<Object> handler = this.handlers.getHandlers(messageBus, localMessage);
             handler.handle(localMessage);
         }else if(this.sagaPersistence.isSagaSubscription(localMessage)){
-            sagaPersistence.dispatch(localMessage);
+            sagaPersistence.dispatch(messageBus, localMessage);
         }else {
             String simpleName = localMessage.getClass().toString();
             LOGGER.warn("No handler or saga registered for {}", simpleName);

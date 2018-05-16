@@ -2,11 +2,15 @@ package org.zeroref.borg.sagas;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.zeroref.borg.MessageBus;
 import org.zeroref.borg.sagas.domain.*;
+
+import static org.mockito.Mockito.mock;
 
 public class SagasTest {
 
     public static final String EMAIL = "user@gmail.com";
+    private MessageBus messageBus = mock(MessageBus.class);
 
     @Test
     public void mapping_red_key() {
@@ -56,7 +60,7 @@ public class SagasTest {
 
         TrialCancelled o = new TrialCancelled();
         o.setUserEmail(EMAIL);
-        persistence.dispatch(o);
+        persistence.dispatch(messageBus, o);
 
         Assert.assertTrue(policyState.isCancelled());
     }
@@ -69,7 +73,7 @@ public class SagasTest {
 
         TrialCancelled o = new TrialCancelled();
         o.setUserEmail(EMAIL);
-        persistence.dispatch(o);
+        persistence.dispatch(messageBus, o);
     }
 
     @Test
@@ -78,7 +82,7 @@ public class SagasTest {
         SagaPersistence persistence = new SagaPersistence(storage);
         persistence.register(TrialPolicy.class);
 
-        persistence.dispatch(new TrialActivated(EMAIL));
+        persistence.dispatch(messageBus, new TrialActivated(EMAIL));
 
         Assert.assertNotNull(storage.sagas.get(EMAIL));
     }
@@ -96,7 +100,7 @@ public class SagasTest {
 
         TrialExpired o = new TrialExpired();
         o.setUserEmail(EMAIL);
-        persistence.dispatch(o);
+        persistence.dispatch(messageBus, o);
 
         Assert.assertEquals(storage.sagas.size(), 0);
     }

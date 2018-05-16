@@ -2,6 +2,7 @@ package org.zeroref.borg.sagas;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeroref.borg.MessageBus;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class SagaPersistence {
         this.storage = storage;
     }
 
-    public void dispatch(Object o) {
+    public void dispatch(MessageBus messageBus, Object o) {
         String sagaId = mapping.readKey(o);
         Class sagaType = evtToSagaType.get(o.getClass());
 
@@ -39,6 +40,7 @@ public class SagaPersistence {
             return;
         }
 
+        saga.setBus(messageBus);
         dispatcher.applyHandle(o, saga);
 
         if(saga.isCompleted()){
