@@ -1,5 +1,7 @@
 package org.zeroref.borg.sample.barista;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeroref.borg.sagas.SagaBase;
 import org.zeroref.borg.sagas.SagasMapping;
 import org.zeroref.borg.sample.cashier.PaymentComplete;
@@ -8,6 +10,8 @@ import org.zeroref.borg.sample.cashier.PrepareDrink;
 import java.util.UUID;
 
 public class BaristaSaga extends SagaBase<BaristaSagaState> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaristaSaga.class);
 
     public void handle(PrepareDrink message)
     {
@@ -18,7 +22,7 @@ public class BaristaSaga extends SagaBase<BaristaSagaState> {
 
         for (int i = 0; i < 10; i++)
         {
-            System.out.println("Barista: preparing drink: " + message.drinkName);
+            LOGGER.info("Barista: preparing drink: " + message.drinkName);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -31,7 +35,7 @@ public class BaristaSaga extends SagaBase<BaristaSagaState> {
 
     public void handle(PaymentComplete message)
     {
-        System.out.println("Barista: got payment notification");
+        LOGGER.info("Barista: got payment notification");
         getState().setGotPayment(true);
         SubmitOrderIfDone();
     }
@@ -42,7 +46,7 @@ public class BaristaSaga extends SagaBase<BaristaSagaState> {
 
         if (state.isGotPayment() && state.isDrinkIsReady())
         {
-            System.out.println("Barista: drink is ready");
+            LOGGER.info("Barista: drink is ready");
 
             UUID correlationId = UUID.fromString(state.getSagaId());
             bus.publish(new DrinkReady(correlationId, state.getName()));

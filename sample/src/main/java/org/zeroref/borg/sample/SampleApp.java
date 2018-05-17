@@ -16,22 +16,20 @@ public class SampleApp  {
         String kfk = "localhost:9092";
         String zk = "localhost:2181";
         try(
-                EndpointWire cashier = new EndpointWire("cashier1", kfk, zk);
-                EndpointWire barista = new EndpointWire("barista1", kfk, zk);
-                EndpointWire customer = new EndpointWire("customer1", kfk, zk)
+                EndpointWire cashier = new EndpointWire("cashier2", kfk, zk);
+                EndpointWire barista = new EndpointWire("barista2", kfk, zk);
+                EndpointWire customer = new EndpointWire("customer2", kfk, zk)
         ){
-            CashierSaga cashierSaga = new CashierSaga();
             cashier.registerSagas(CashierSaga.class);
             cashier.configure();
 
-            BaristaSaga baristaSaga = new BaristaSaga();
-            barista.subscribeToEndpoint("cashier1", PrepareDrink.class, PaymentComplete.class);
+            barista.subscribeToEndpoint("cashier2", PrepareDrink.class, PaymentComplete.class);
             barista.registerSagas(BaristaSaga.class);
             barista.configure();
 
             CustomerController controller = new CustomerController();
-            customer.registerEndpointRoute("cashier1", NewOrder.class);
-            customer.subscribeToEndpoint("barista1", DrinkReady.class);
+            customer.registerEndpointRoute("cashier2", NewOrder.class);
+            customer.subscribeToEndpoint("barista2", DrinkReady.class);
             customer.registerHandler(DrinkReady.class, b -> controller::handle);
             customer.registerHandler(PaymentDue.class, b -> m -> controller.handle(b, m));
             customer.configure();

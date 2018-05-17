@@ -1,15 +1,21 @@
 package org.zeroref.borg.sample.cashier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeroref.borg.MessageBus;
 import org.zeroref.borg.sagas.SagaBase;
 import org.zeroref.borg.sagas.SagasMapping;
+import org.zeroref.borg.sample.barista.BaristaSaga;
 import org.zeroref.borg.sample.barista.BaristaSagaState;
 
 import java.util.UUID;
 
 public class CashierSaga extends SagaBase<CashierSagaState> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CashierSaga.class);
+
     public void handle(NewOrder message){
-        System.out.println("Cashier: got new order");
+        LOGGER.info("Cashier: got new order");
 
         CashierSagaState state = new CashierSagaState();
         state.setSagaId(message.correlationId);
@@ -30,7 +36,7 @@ public class CashierSaga extends SagaBase<CashierSagaState> {
     }
 
     public void handle(SubmitPayment message){
-        System.out.println("Cashier: got payment");
+        LOGGER.info("Cashier: got payment");
         bus.publish(new PaymentComplete(message.correlationId));
     }
 
