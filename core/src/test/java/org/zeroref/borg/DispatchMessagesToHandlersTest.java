@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 
 public class DispatchMessagesToHandlersTest {
 
-    MessageEnvelope envelope = new MessageEnvelope(UUID.randomUUID(), "", new HashMap<>(), new Ping());
+    MessageEnvelope envelope = new MessageEnvelope(UUID.randomUUID(), "", new Ping());
     KafkaMessageSender sender = mock(KafkaMessageSender.class);
     MessageBus bus = mock(UnicastMessageBus.class);
     EndpointId endpointId = new EndpointId("");

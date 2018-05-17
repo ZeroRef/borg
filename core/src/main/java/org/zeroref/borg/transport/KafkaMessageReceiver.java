@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroref.borg.MessageEnvelope;
@@ -15,7 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class KafkaMessageReceiver {
-    private  KafkaConsumer<String, TransportRecord> consumer;
+    private  KafkaConsumer<String, String> consumer;
     private final Properties props;
     private final List<String> topics;
 
@@ -33,8 +34,8 @@ public class KafkaMessageReceiver {
         props.put("session.timeout.ms", "30000");
         props.put("auto.offset.reset", "earliest");
         props.put("max.poll.records", "1"); /* records to include in 1 poll */
-        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put("value.deserializer", "org.zeroref.borg.transport.TransportRecordByteSerializer");
+        props.put("key.deserializer", StringDeserializer.class.getName());
+        props.put("value.deserializer", StringDeserializer.class.getName());
     }
 
     public void start() {
@@ -51,9 +52,9 @@ public class KafkaMessageReceiver {
 
     public MessageEnvelope receive() throws Exception {
 
-        ConsumerRecords<String, TransportRecord> records = consumer.poll(500);
+        ConsumerRecords<String, String> records = consumer.poll(500);
 
-        for (ConsumerRecord<String, TransportRecord> record : records) {
+        for (ConsumerRecord<String, String> record : records) {
             MessageEnvelope envelope = serializer.recordToEnvelope(record.value());
             envelope.setOffset(recordOffset(record));
 
@@ -63,7 +64,7 @@ public class KafkaMessageReceiver {
         return null;
     }
 
-    HashMap<TopicPartition, OffsetAndMetadata> recordOffset(ConsumerRecord<String, TransportRecord> record) {
+    HashMap<TopicPartition, OffsetAndMetadata> recordOffset(ConsumerRecord<String, String> record) {
         HashMap<TopicPartition, OffsetAndMetadata> offsets = new HashMap<>();
         offsets.put(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset()+1));
         return offsets;

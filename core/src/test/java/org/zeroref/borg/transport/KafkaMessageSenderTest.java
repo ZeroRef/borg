@@ -7,7 +7,6 @@ import org.zeroref.borg.MessageEnvelope;
 import org.zeroref.borg.lab.Msg;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class KafkaMessageSenderTest extends Env {
@@ -20,7 +19,6 @@ public class KafkaMessageSenderTest extends Env {
         MessageEnvelope envelope = new MessageEnvelope(
                 UUID.randomUUID(),
                 "b",
-                new HashMap<>(),
                 new Msg.Tick()
 
         );
@@ -28,6 +26,4 @@ public class KafkaMessageSenderTest extends Env {
 
         Assert.assertEquals(countMessages("a"), 1);
     }
-
-
 }

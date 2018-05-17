@@ -17,17 +17,10 @@ public class Msg {
 
     public static String fromInstance(Object cl, String originator){
         return "{" +
-                "\"uuid\":\"9fb046d0-4318-4f2e-8ec3-0152449ebe7d\"," +
-                "\"headers\":{}," +
-                "\"content\":{" +
-                "\"returnAddress\":\"" +
-                originator +
-                "\"," +
-                "\"type\":\"" +
-                cl.getClass().getName() +
-                "\"," +
+                "\"id\":\"f8ce617c-6445-4141-9cd7-78fa0bf2210c\"," +
+                "\"type\":\"" + cl.getClass().getName() + "\"," +
+                "\"returnAddress\":\"" + originator + "\"," +
                 "\"payload\":" + recordGson.toJson(cl) +
-                "}" +
                 "}\n";
     }
 }
