@@ -21,12 +21,11 @@ public class RecoveryTest extends Env {
             });
             wire.configure();
 
-            send("manual-review", Msg.from(Msg.Ping.class));
+            send("manual-review", Msg.fromInstance(new Msg.Ping()));
 
-            Thread.sleep(6000);
 
-            Assert.assertEquals(cnt.get(), 5);
             Assert.assertEquals(countMessages("manual-review.errors"), 1);
+            Assert.assertEquals(cnt.get(), 6);
         }
     }
 
@@ -41,12 +40,11 @@ public class RecoveryTest extends Env {
             });
             wire.configure();
 
-            send("recover-in-slr", Msg.from(Msg.Ping.class));
+            send("recover-in-slr", Msg.fromInstance(new Msg.Ping()));
 
-            Thread.sleep(6000);
 
+            Assert.assertEquals(expect0Messages("recover-in-slr.errors", 2000), 0);
             Assert.assertEquals(cnt.get(), 5);
-            Assert.assertEquals(countMessages("recover-in-slr.errors"), 0);
         }
     }
 
@@ -61,12 +59,11 @@ public class RecoveryTest extends Env {
             });
             wire.configure();
 
-            send("recover-in-flr", Msg.from(Msg.Ping.class));
+            send("recover-in-flr", Msg.fromInstance(new Msg.Ping()));
 
-            Thread.sleep(4000);
 
+            Assert.assertEquals(expect0Messages("recover-in-flr.errors", 500), 0);
             Assert.assertEquals(cnt.get(), 2);
-            Assert.assertEquals(countMessages("recover-in-flr.errors"), 0);
         }
     }
 }

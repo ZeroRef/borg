@@ -14,11 +14,11 @@ public class KafkaMessageReceiverTest extends Env {
     @Test
     public void receive_message_from_topic() throws Exception {
 
-        send("aaaaaaaa", Msg.from(Msg.Tick.class));
+        send("aaaaaaaa", Msg.fromInstance(new Msg.Tick()));
 
         List<String> subs = Arrays.asList("aaaaaaaa");
 
-        KafkaMessageReceiver receiver = new KafkaMessageReceiver(CLUSTER.getKfkConnectionString(),subs);
+        KafkaMessageReceiver receiver = new KafkaMessageReceiver(CLUSTER.getKfkConnectionString(), "gr", subs);
         receiver.start();
 
         for (int i = 0; i < 5; i++) {

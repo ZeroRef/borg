@@ -7,6 +7,7 @@ import org.zeroref.borg.directions.MessageSubscriptions;
 import org.zeroref.borg.pipeline.MessageHandlerTable;
 import org.zeroref.borg.recoverability.BackOff;
 import org.zeroref.borg.runtime.EndpointId;
+import org.zeroref.borg.sagas.SagaPersistence;
 
 import java.util.List;
 import java.util.Map;
@@ -59,5 +60,16 @@ public class ConfigurationInspector {
 
     public void inspectSlr(BackOff backoff) {
         detailsAcc.append("\n\t SLR:" + backoff.getDurations());
+    }
+
+    public void inspectSagas(SagaPersistence sagaPersistence) {
+        detailsAcc.append("\n\t Sagas:");
+
+        Map<Class, List<Class>> confSagas = sagaPersistence.getConfSagas();
+
+        for (Map.Entry<Class, List<Class>> cl: confSagas.entrySet()) {
+            List<String> types = cl.getValue().stream().map(x -> x.getSimpleName()).collect(Collectors.toList());
+            detailsAcc.append("\n\t\t " + cl.getKey().getSimpleName() + " " + String.join(",", types) );
+        }
     }
 }

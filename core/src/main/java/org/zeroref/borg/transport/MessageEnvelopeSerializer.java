@@ -1,43 +1,41 @@
 package org.zeroref.borg.transport;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeroref.borg.MessageEnvelope;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 
 public class MessageEnvelopeSerializer {
     private Gson gson = new Gson();
+    private JsonParser parser = new JsonParser();
 
-    public ProducerRecord<String, TransportRecord> envelopeToRecord(MessageEnvelope envelope, String topic) {
-        HashMap<String, String> content = new HashMap<>();
-        content.put("type", envelope.getLocalMessage().getClass().getName());
-        content.put("payload", gson.toJson(envelope.getLocalMessage()));
-        content.put("returnAddress", envelope.getReturnAddress());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageEnvelopeSerializer.class);
 
-        TransportRecord transportRecord = new TransportRecord(
-                envelope.getUuid(),
-                content,
-                envelope.getHeaders()
-        );
+    public ProducerRecord<String, String> envelopeToRecord(MessageEnvelope envelope, String topic) {
 
-        return new ProducerRecord<>(topic, transportRecord);
+        JsonObject record = new JsonObject();
+        record.addProperty("id", envelope.getUuid().toString());
+        record.addProperty("type", envelope.getLocalMessage().getClass().getName());
+        record.addProperty("returnAddress", envelope.getReturnAddress());
+        record.add("payload",  gson.toJsonTree(envelope.getLocalMessage()));
+
+        return new ProducerRecord<>(topic, record.toString());
     }
 
-    public MessageEnvelope recordToEnvelope(TransportRecord record1) throws ClassNotFoundException {
-        Map<String, String> content = record1.getContent();
+    public MessageEnvelope recordToEnvelope(String record1) throws ClassNotFoundException {
+        JsonObject envJson = (JsonObject)parser.parse(record1);
 
-        String returnAddress = content.get("returnAddress");
-        String payload = content.get("payload");
-        Class type = Class.forName(content.get("type"));
+        UUID id = UUID.fromString(envJson.get("id").getAsString());
+        String returnAddr = envJson.get("returnAddress").getAsString();
+        Class type = Class.forName(envJson.get("type").getAsString());
 
-        Object localMessage = gson.fromJson(payload, type);
+        JsonObject payloadObj = (JsonObject)parser.parse(envJson.get("payload").toString());
+        Object localMessage = gson.fromJson(payloadObj, type);
 
-        return new MessageEnvelope(
-                record1.getUuid(),
-                returnAddress,
-                record1.getHeaders(),
-                localMessage);
+        return new MessageEnvelope(id, returnAddr, localMessage);
     }
 }

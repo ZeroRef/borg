@@ -25,4 +25,8 @@ public class MessageHandlerTable {
             handlers.put(c, messageBus -> handler.apply(messageBus));
         }
     }
+
+    public boolean isHandlerSubscription(Object evt) {
+        return handlers.containsKey(evt.getClass());
+    }
 }

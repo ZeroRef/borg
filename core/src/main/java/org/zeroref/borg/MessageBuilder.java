@@ -1,7 +1,5 @@
 package org.zeroref.borg;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class MessageBuilder {
@@ -11,20 +9,10 @@ public class MessageBuilder {
         this.localAddress = localAddress;
     }
 
-    public MessageEnvelope buildMessage(Map<String, String> headers, Object message) {
-        return new MessageEnvelope(
-                UUID.randomUUID(),
-                localAddress,
-                headers,
-                message
-        );
-    }
-
     public MessageEnvelope buildMessage(Object message) {
         return new MessageEnvelope(
                 UUID.randomUUID(),
                 localAddress,
-                new HashMap<>(),
                 message
         );
     }

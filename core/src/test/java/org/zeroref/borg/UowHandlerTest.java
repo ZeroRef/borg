@@ -31,9 +31,7 @@ public class UowHandlerTest extends Env {
             wire.registerHandler(Msg.Ping.class, bus -> new PingUowHandler(bus));
             wire.configure();
 
-            send("uow", Msg.from(Msg.Ping.class));
-
-            Thread.sleep(4000);
+            send("uow", Msg.fromInstance(new Msg.Ping()));
 
             Assert.assertEquals(countMessages("uow.events"), 0);
             Assert.assertEquals(countMessages("uow.errors"), 1);

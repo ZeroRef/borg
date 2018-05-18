@@ -30,10 +30,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class SingleNodeKafkaCluster {
@@ -291,7 +288,7 @@ public class SingleNodeKafkaCluster {
     private <T> List<T> readMessages(final String topicName, final int maxPoll, final MessageExtractor<T> messageExtractor) {
         final Properties props = new Properties();
         props.put("bootstrap.servers", brokerString);
-        props.put("group.id", "test");
+        props.put("group.id", "test"+ System.nanoTime());
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.interval.ms", "1000");
         props.put("session.timeout.ms", "30000");

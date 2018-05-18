@@ -7,6 +7,7 @@ import org.zeroref.borg.pipeline.HandleMessages;
 import org.zeroref.borg.pipeline.MessageHandlerTable;
 import org.zeroref.borg.pipeline.MessagePipeline;
 import org.zeroref.borg.runtime.EndpointId;
+import org.zeroref.borg.sagas.SagaPersistence;
 import org.zeroref.borg.transport.KafkaMessageSender;
 
 import java.util.HashMap;
@@ -17,16 +18,17 @@ import static org.mockito.Mockito.mock;
 
 public class DispatchMessagesToHandlersTest {
 
-    MessageEnvelope envelope = new MessageEnvelope(UUID.randomUUID(), "", new HashMap<>(), new Ping());
+    MessageEnvelope envelope = new MessageEnvelope(UUID.randomUUID(), "", new Ping());
     KafkaMessageSender sender = mock(KafkaMessageSender.class);
     MessageBus bus = mock(UnicastMessageBus.class);
     EndpointId endpointId = new EndpointId("");
     MessageDestinations router = mock(MessageDestinations.class);
+    SagaPersistence sagaPersistence = mock(SagaPersistence.class);
 
     @Test
     public void when_no_handler_registered_will_noop(){
         MessageHandlerTable table = new MessageHandlerTable();
-        MessagePipeline pipeline = new MessagePipeline(table, sender, endpointId, router);
+        MessagePipeline pipeline = new MessagePipeline(table, sender, endpointId, router, sagaPersistence);
 
         pipeline.dispatch(envelope);
     }
@@ -37,7 +39,7 @@ public class DispatchMessagesToHandlersTest {
 
         MessageHandlerTable table = new MessageHandlerTable();
         table.registerHandler(Ping.class, messageBus -> message -> cnt.incrementAndGet());
-        MessagePipeline pipeline = new MessagePipeline(table, sender, endpointId, router);
+        MessagePipeline pipeline = new MessagePipeline(table, sender, endpointId, router, sagaPersistence);
 
         pipeline.dispatch(envelope);
 
