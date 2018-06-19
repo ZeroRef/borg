@@ -6,6 +6,7 @@ import org.zeroref.borg.*;
 import org.zeroref.borg.directions.MessageDestinations;
 import org.zeroref.borg.runtime.EndpointId;
 import org.zeroref.borg.sagas.SagaPersistence;
+import org.zeroref.borg.timeouts.TimeoutManager;
 import org.zeroref.borg.transport.KafkaMessageSender;
 
 
@@ -16,14 +17,16 @@ public class MessagePipeline implements DispatchMessagesToHandlers {
     private EndpointId endpointId;
     private MessageDestinations router;
     private SagaPersistence sagaPersistence;
+    private TimeoutManager timeouts;
     private static final Logger LOGGER = LoggerFactory.getLogger(MessagePipeline.class);
 
-    public MessagePipeline(MessageHandlerTable handlers, KafkaMessageSender sender, EndpointId endpointId, MessageDestinations router, SagaPersistence sagaPersistence) {
+    public MessagePipeline(MessageHandlerTable handlers, KafkaMessageSender sender, EndpointId endpointId, MessageDestinations router, SagaPersistence sagaPersistence, TimeoutManager timeouts) {
         this.handlers = handlers;
         this.sender = sender;
         this.endpointId = endpointId;
         this.router = router;
         this.sagaPersistence = sagaPersistence;
+        this.timeouts = timeouts;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class MessagePipeline implements DispatchMessagesToHandlers {
             HandleMessages<Object> handler = this.handlers.getHandlers(messageBus, localMessage);
             handler.handle(localMessage);
         }else if(this.sagaPersistence.isSagaSubscription(localMessage)){
-            sagaPersistence.dispatch(messageBus, localMessage);
+            sagaPersistence.dispatch(messageBus, timeouts,localMessage);
         }else {
             String simpleName = localMessage.getClass().toString();
             LOGGER.warn("No handler or saga registered for {}", simpleName);

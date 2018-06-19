@@ -1,8 +1,6 @@
 package org.zeroref.borg.sagas.domain;
 
-import org.zeroref.borg.sagas.SagaWiredTest;
 import org.zeroref.borg.sagas.SagaBase;
-import org.zeroref.borg.sagas.SagaState;
 import org.zeroref.borg.sagas.SagasMapping;
 
 public class MiniSaga extends SagaBase<MiniSagaState> {

@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.zeroref.borg.MessageBus;
 import org.zeroref.borg.sagas.domain.*;
+import org.zeroref.borg.timeouts.TimeoutManager;
 
 import static org.mockito.Mockito.mock;
 
@@ -11,6 +12,7 @@ public class SagasTest {
 
     public static final String EMAIL = "user@gmail.com";
     private MessageBus messageBus = mock(MessageBus.class);
+    private TimeoutManager timeouts = mock(TimeoutManager.class);
 
     @Test
     public void mapping_red_key() {
@@ -60,7 +62,7 @@ public class SagasTest {
 
         TrialCancelled o = new TrialCancelled();
         o.setUserEmail(EMAIL);
-        persistence.dispatch(messageBus, o);
+        persistence.dispatch(messageBus, timeouts, o);
 
         Assert.assertTrue(policyState.isCancelled());
     }
@@ -73,7 +75,7 @@ public class SagasTest {
 
         TrialCancelled o = new TrialCancelled();
         o.setUserEmail(EMAIL);
-        persistence.dispatch(messageBus, o);
+        persistence.dispatch(messageBus, timeouts, o);
     }
 
     @Test
@@ -82,7 +84,7 @@ public class SagasTest {
         SagaPersistence persistence = new SagaPersistence(storage);
         persistence.register(TrialPolicy.class);
 
-        persistence.dispatch(messageBus, new TrialActivated(EMAIL));
+        persistence.dispatch(messageBus, timeouts, new TrialActivated(EMAIL));
 
         Assert.assertNotNull(storage.sagas.get(EMAIL));
     }
@@ -100,7 +102,7 @@ public class SagasTest {
 
         TrialExpired o = new TrialExpired();
         o.setUserEmail(EMAIL);
-        persistence.dispatch(messageBus, o);
+        persistence.dispatch(messageBus, timeouts, o);
 
         Assert.assertEquals(storage.sagas.size(), 0);
     }

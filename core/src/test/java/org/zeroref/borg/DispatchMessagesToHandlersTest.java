@@ -8,9 +8,9 @@ import org.zeroref.borg.pipeline.MessageHandlerTable;
 import org.zeroref.borg.pipeline.MessagePipeline;
 import org.zeroref.borg.runtime.EndpointId;
 import org.zeroref.borg.sagas.SagaPersistence;
+import org.zeroref.borg.timeouts.TimeoutManager;
 import org.zeroref.borg.transport.KafkaMessageSender;
 
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,11 +24,12 @@ public class DispatchMessagesToHandlersTest {
     EndpointId endpointId = new EndpointId("");
     MessageDestinations router = mock(MessageDestinations.class);
     SagaPersistence sagaPersistence = mock(SagaPersistence.class);
+    TimeoutManager timeouts = mock(TimeoutManager.class);
 
     @Test
     public void when_no_handler_registered_will_noop(){
         MessageHandlerTable table = new MessageHandlerTable();
-        MessagePipeline pipeline = new MessagePipeline(table, sender, endpointId, router, sagaPersistence);
+        MessagePipeline pipeline = new MessagePipeline(table, sender, endpointId, router, sagaPersistence, timeouts);
 
         pipeline.dispatch(envelope);
     }
@@ -39,7 +40,7 @@ public class DispatchMessagesToHandlersTest {
 
         MessageHandlerTable table = new MessageHandlerTable();
         table.registerHandler(Ping.class, messageBus -> message -> cnt.incrementAndGet());
-        MessagePipeline pipeline = new MessagePipeline(table, sender, endpointId, router, sagaPersistence);
+        MessagePipeline pipeline = new MessagePipeline(table, sender, endpointId, router, sagaPersistence, timeouts);
 
         pipeline.dispatch(envelope);
 
