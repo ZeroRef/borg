@@ -27,17 +27,20 @@ public class SagaPersistence {
     public void dispatch(MessageBus messageBus, TimeoutManager timeouts, Object o) {
         String sagaId = mapping.readKey(o);
         Class sagaType = evtToSagaType.get(o.getClass());
+        String sagaTypeName = sagaType.getSimpleName();
 
         SagaState initialState = storage.getById(sagaId);
         SagaBase saga;
 
         if (initialState != null) {
+            LOGGER.debug("Saga {} id#{} loaded", sagaTypeName,sagaId);
             saga = constructSagaByType(sagaType);
             saga.setState(initialState);
         } else if (initialState == null && mapping.isCreational(o.getClass())) {
+            LOGGER.debug("Saga {} id#{} initiated", sagaTypeName,sagaId);
             saga = constructSagaByType(sagaType);
         }else {
-            LOGGER.warn("Saga {} id#{} missing or has been terminated", sagaType,sagaId);
+            LOGGER.warn("Saga {} id#{} missing or has been terminated", sagaTypeName,sagaId);
             return;
         }
 
@@ -47,6 +50,7 @@ public class SagaPersistence {
 
         if(saga.isCompleted()){
             storage.discontinue(sagaId);
+            LOGGER.debug("Saga {} id#{} terminated", sagaTypeName,sagaId);
             return;
         }
 

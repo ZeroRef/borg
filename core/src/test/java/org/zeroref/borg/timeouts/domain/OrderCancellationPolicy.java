@@ -37,6 +37,8 @@ public class OrderCancellationPolicy extends SagaBase<OrderCancellationPolicySta
         state.setCancelled(true);
 
         bus.publish(new OrderRefundAllowance(state.getQualifiedRefund()));
+
+        markCompleted();
     }
 
     public void handle(FullRefundExpiredTimeout cmd){
@@ -52,9 +54,9 @@ public class OrderCancellationPolicy extends SagaBase<OrderCancellationPolicySta
     @Override
     public void howToFindSaga(SagasMapping mapping) {
         mapping.create(OrderBilled.class, bill -> bill.getId());
-        mapping.create(OrderShipped.class, shipping -> shipping.getId());
-        mapping.create(CancelOrder.class, attempt -> attempt.getId());
-        mapping.create(FullRefundExpiredTimeout.class, t1 -> t1.getId());
-        mapping.create(PartialRefundExpiredTimeout.class, t2 -> t2.getId());
+        mapping.map(OrderShipped.class, shipping -> shipping.getId());
+        mapping.map(CancelOrder.class, attempt -> attempt.getId());
+        mapping.map(FullRefundExpiredTimeout.class, t1 -> t1.getId());
+        mapping.map(PartialRefundExpiredTimeout.class, t2 -> t2.getId());
     }
 }

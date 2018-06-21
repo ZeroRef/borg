@@ -6,8 +6,11 @@ import org.zeroref.borg.*;
 import org.zeroref.borg.directions.MessageDestinations;
 import org.zeroref.borg.runtime.EndpointId;
 import org.zeroref.borg.sagas.SagaPersistence;
+import org.zeroref.borg.timeouts.Timeout;
 import org.zeroref.borg.timeouts.TimeoutManager;
 import org.zeroref.borg.transport.KafkaMessageSender;
+
+import java.util.UUID;
 
 
 public class MessagePipeline implements DispatchMessagesToHandlers {
@@ -37,10 +40,35 @@ public class MessagePipeline implements DispatchMessagesToHandlers {
 
         Object localMessage = message.getLocalMessage();
 
+
         if(this.handlers.isHandlerSubscription(localMessage)){
+            LOGGER.debug("Dispatch to handler {}", localMessage.getClass().getSimpleName());
+
             HandleMessages<Object> handler = this.handlers.getHandlers(messageBus, localMessage);
             handler.handle(localMessage);
         }else if(this.sagaPersistence.isSagaSubscription(localMessage)){
+            LOGGER.debug("Dispatch to saga {}", localMessage.getClass().getSimpleName());
+
+            sagaPersistence.dispatch(messageBus, timeouts,localMessage);
+        }else {
+            String simpleName = localMessage.getClass().toString();
+            LOGGER.warn("No handler or saga registered for {}", simpleName);
+        }
+
+        unitOfWork.complete();
+    }
+
+    @Override
+    public void dispatch(Timeout timeout) {
+        Object localMessage = timeout.getData();
+
+        MessageBus slim = netMessageBus(localMessage);
+        UnitOfWork unitOfWork = new UnitOfWork();
+        TransactionalMessageBus messageBus = new TransactionalMessageBus(slim, unitOfWork);
+
+        if(this.sagaPersistence.isSagaSubscription(localMessage)){
+            LOGGER.debug("Dispatch to saga {}", localMessage.getClass().getSimpleName());
+
             sagaPersistence.dispatch(messageBus, timeouts,localMessage);
         }else {
             String simpleName = localMessage.getClass().toString();
@@ -52,5 +80,10 @@ public class MessagePipeline implements DispatchMessagesToHandlers {
 
     public MessageBus netMessageBus(MessageEnvelope message) {
         return new UnicastMessageBus(sender, message, endpointId, router);
+    }
+
+    public MessageBus netMessageBus(Object o) {
+        MessageEnvelope envelope = new MessageEnvelope(UUID.randomUUID(), endpointId.getInputTopicName(), o);
+        return new UnicastMessageBus(sender, envelope, endpointId, router);
     }
 }

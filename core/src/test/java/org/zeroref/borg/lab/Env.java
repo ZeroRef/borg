@@ -1,10 +1,13 @@
 package org.zeroref.borg.lab;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
+import org.zeroref.borg.UnicastMessageBus;
 import org.zeroref.borg.runtime.EndpointWire;
 
 import java.io.IOException;
@@ -13,6 +16,8 @@ import java.util.List;
 public class Env {
 
     public static SingleNodeKafkaCluster CLUSTER;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Env.class);
 
     @BeforeClass
     public void boot() throws IOException {
@@ -85,6 +90,7 @@ public class Env {
     }
 
     protected void send(String topic, String message){
+        LOGGER.info("send {} {}", topic, message);
         CLUSTER.sendMessages(new ProducerRecord<>(topic, message));
     }
 

@@ -15,7 +15,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class InMemoryTimeoutManager implements TimeoutManager, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(InMemoryTimeoutManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimeoutManager.class);
+
     private static final int TIMER_THREAD_POOL_SIZE = 2;
     private final Object sync = new Object();
 
@@ -62,6 +63,8 @@ public class InMemoryTimeoutManager implements TimeoutManager, AutoCloseable {
             openTimeouts.put(id, sagaId, future);
         }
 
+        LOGGER.debug("Timeout request#{} {}#{} {}={} payload={}",id, name, sagaId, timeUnit, delay, data.getClass().getSimpleName());
+
         return id;
     }
 
@@ -102,12 +105,17 @@ public class InMemoryTimeoutManager implements TimeoutManager, AutoCloseable {
     private void timeoutExpired(final Timeout timeout) {
         try {
             removeExpiredTimeout(timeout);
+            LOGGER.debug("Timeout rise#{} {}#{} payload={}",
+                    timeout.getId(),
+                    timeout.getName(),
+                    timeout.getSagaId(),
+                    timeout.getData().getClass().getSimpleName());
 
             for (TimeoutExpired callback : callbacks) {
                 callback.expired(timeout);
             }
         } catch (Exception ex) {
-            LOG.error("Error handling timeout.", ex);
+            LOGGER.error("Error handling timeout.", ex);
         }
     }
 

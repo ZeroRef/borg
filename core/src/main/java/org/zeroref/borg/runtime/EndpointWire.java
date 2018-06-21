@@ -15,9 +15,7 @@ import org.zeroref.borg.directions.MessageSubscriptions;
 import org.zeroref.borg.pipeline.HandleMessages;
 import org.zeroref.borg.pipeline.MessageHandlerTable;
 import org.zeroref.borg.pipeline.MessagePipeline;
-import org.zeroref.borg.recoverability.BackOff;
-import org.zeroref.borg.recoverability.Dispatcher;
-import org.zeroref.borg.recoverability.ManagedEventLoop;
+import org.zeroref.borg.recoverability.*;
 import org.zeroref.borg.sagas.SagaBase;
 import org.zeroref.borg.sagas.SagaPersistence;
 import org.zeroref.borg.sagas.SagaStorage;
@@ -44,6 +42,7 @@ public class EndpointWire implements Closeable{
     private ManagedEventLoop inputEventLoop;
     private ManagedEventLoop slrEventLoop;
     private ManagedEventLoop subscriptionsEventLoop;
+    private ManagedEventLoop timeoutsEventLoop;
     private final List<String> inputTopics;
     private final SagaPersistence sagaPersistence = new SagaPersistence(new SagaStorage());
     private final TimeoutManager timeouts = new InMemoryTimeoutManager();
@@ -53,7 +52,7 @@ public class EndpointWire implements Closeable{
 
     private final ConfigurationInspector inspector;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManagedEventLoop.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessagingEventLoop.class);
 
     public EndpointWire(String endpoint,String kafkaConnection, String zookeeper) {
         this.endpointId = new EndpointId(endpoint);
@@ -81,14 +80,17 @@ public class EndpointWire implements Closeable{
         createTopic(endpointId.getSlrTopicName(), 1, 1, new Properties());
         createTopic(endpointId.getErrorsTopicName(), 1, 1, new Properties());
 
-        subscriptionsEventLoop = newLoopWithSlr(endpointId.getInputTopicName() + "-sub", subscriptions.sources());
-        inputEventLoop = newLoopWithSlr(endpointId.getInputTopicName()+ "-in", inputTopics);
+        subscriptionsEventLoop = newMessagingLoopWithSlr(endpointId.getInputTopicName() + "-sub", subscriptions.sources());
+        inputEventLoop = newMessagingLoopWithSlr(endpointId.getInputTopicName()+ "-in", inputTopics);
 
-        slrEventLoop = newLoopWithError(endpointId.getInputTopicName()+ "-slr", Arrays.asList(endpointId.getSlrTopicName()));
+        slrEventLoop = newMessagingWithError(endpointId.getInputTopicName()+ "-slr", Arrays.asList(endpointId.getSlrTopicName()));
 
+        timeoutsEventLoop = newTimeoutWithError();
 
         if(!subscriptions.sources().isEmpty())
             subscriptionsEventLoop.start();
+
+        timeoutsEventLoop.start();
 
         inputEventLoop.start();
         slrEventLoop.start();
@@ -100,19 +102,26 @@ public class EndpointWire implements Closeable{
         if(!subscriptions.sources().isEmpty())
             subscriptionsEventLoop.close();
 
+        timeoutsEventLoop.close();
+
         inputEventLoop.close();
         slrEventLoop.close();
         sender.stop();
     }
 
-    private ManagedEventLoop newLoopWithSlr(String name, List<String> topics){
+    private ManagedEventLoop newMessagingLoopWithSlr(String name, List<String> topics){
         Dispatcher forwardSlr = Dispatcher.withSrl(pipeline, sender, endpointId, flrBackoff);
-        return new ManagedEventLoop(name, kafkaConnection, topics, forwardSlr);
+        return new MessagingEventLoop(name, kafkaConnection, topics, forwardSlr);
     }
 
-    private ManagedEventLoop newLoopWithError(String name, List<String> topics){
+    private ManagedEventLoop newMessagingWithError(String name, List<String> topics){
         Dispatcher forwardError = Dispatcher.withError(pipeline, sender, endpointId, slrBackoff);
-        return new ManagedEventLoop(name, kafkaConnection, topics, forwardError);
+        return new MessagingEventLoop(name, kafkaConnection, topics, forwardError);
+    }
+
+    private ManagedEventLoop newTimeoutWithError(){
+        Dispatcher forwardError = Dispatcher.withError(pipeline, sender, endpointId, slrBackoff);
+        return new TimeoutsEventLoop(timeouts, forwardError);
     }
 
     public void registerEndpointRoute(String endpointId, Class<?> ... types) {

@@ -6,6 +6,7 @@ import org.zeroref.borg.MessageEnvelope;
 import org.zeroref.borg.pipeline.DispatchMessagesToHandlers;
 import org.zeroref.borg.pipeline.MessagePipeline;
 import org.zeroref.borg.runtime.EndpointId;
+import org.zeroref.borg.timeouts.Timeout;
 import org.zeroref.borg.transport.KafkaMessageSender;
 
 import java.util.Arrays;
@@ -46,6 +47,25 @@ public abstract class Dispatcher implements DispatchMessagesToHandlers {
                 if(attempt == 2){
                     escalateTo(message, e);
                     sender.send(Arrays.asList(forwardTo), message);
+                }
+            }
+        }
+    }
+
+    public void dispatch(Timeout timeout) {
+        for (int attempt = 0; attempt < 3; attempt++) {
+            try{
+                messagePipeline.dispatch(timeout);
+                return;
+            }catch (Exception e){
+
+                LOGGER.warn("Attempt#{}", attempt, e);
+
+                long backoffDuration = backoffStep.get(attempt);
+
+                try {
+                    Thread.sleep(backoffDuration);
+                } catch (InterruptedException e1) {
                 }
             }
         }
